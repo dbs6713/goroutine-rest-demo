@@ -1,12 +1,14 @@
 package main
 
 // This program makes HTTP requests to three different URLs using goroutines.
-// You can think of a goroutine as a forked process, and what you should see is
-// that slower HTTP calls will appear last in the output, even if they appear
-// first in the code.
+// We will wait for each goroutine to finish by using a wait group. You can
+// think of a goroutine as a fork, and the wait group as a counter that waits
+// for n forks to terminate.
 //
-// In my case, bbc.co.uk takes longest to respond and appears last in the
-// program's output, even though it appears first in the code.
+// What you should see is that slower HTTP calls will appear last in the
+// output, even if they appear first in the code. In my case, bbc.co.uk takes
+// longest to respond and appears last in the program's output, even though it
+// appears first in the code.
 
 import (
 	"fmt"
@@ -28,6 +30,9 @@ func get(url string, w *sync.WaitGroup) {
 }
 
 func main() {
+	// This is the number of OS threads Go will use to run our program. We need
+	// to set this > 1 to see real concurrency, otherwise our goroutines will
+	// just run sequentially in one thread.
 	runtime.GOMAXPROCS(4)
 
 	// We need to let go know that it should wait for 3 goroutines to finish
